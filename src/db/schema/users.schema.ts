@@ -22,7 +22,10 @@ export const users = pgTable('users', {
   resetTokenExpiresAt: timestamp('reset_token_expires_at'),
   refreshTokenHash: text('refresh_token_hash'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
 });
 
 export type User = typeof users.$inferSelect;
