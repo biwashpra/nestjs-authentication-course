@@ -1,9 +1,14 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { EmailService } from './email/email.service';
 import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
 
@@ -45,6 +50,41 @@ export class AuthService {
     return {
       message:
         'Registration Successful. Please check your email to verify your account',
+    };
+  }
+
+  async login(dto: LoginDto, res: Response) {
+    const user = await this.userService.findByEmail(dto.email);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid Email or Password');
+    }
+
+    const passwordMatched = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
+
+    if (!passwordMatched) {
+      throw new UnauthorizedException('Invalid Email or Password');
+    }
+
+    if (!user.isVerified) {
+      throw new UnauthorizedException('Please verify your email to continue');
+    }
+
+    const { refreshToken, accessToken } = await this.generateTokens(user);
+    await this.saveRefreshToken(user.id, refreshToken);
+    this.setRefreshTokenCookie(res, refreshToken);
+
+    return {
+      accessToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
     };
   }
 }
