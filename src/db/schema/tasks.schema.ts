@@ -19,5 +19,5 @@ export const tasks = pgTable('tasks', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export type ITask = typeof tasks.$inferSelect;
-export type INewTask = typeof tasks.$inferInsert;
+export type Task = typeof tasks.$inferSelect;
+export type NewTask = typeof tasks.$inferInsert;
