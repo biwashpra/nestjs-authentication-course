@@ -96,3 +96,30 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+## Added Packages
+
+```bash
+pnpm add bcryptjs class-validator class-transformer cookie-parser resend
+```
+
+dependencies:
+
+- bcryptjs 3.0.3
+- class-transformer 0.5.1
+- class-validator 0.15.1
+- cookie-parser 1.4.7
+- resend 6.18.0
+
+```bash
+pnpm add @nestjs/swagger swagger-ui-express
+```
+
+dependencies:
+
+- @nestjs/swagger 11.4.6
+- swagger-ui-express 5.0.1
+
+```bash
+pnpm add -D @types/bcrypt @types/cookie-parser drizzle-kit dotenv
+```
