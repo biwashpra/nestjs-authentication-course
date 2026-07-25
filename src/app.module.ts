@@ -6,7 +6,7 @@ import { UsersModule } from './users/users.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      expandVariables: true, // This means we can assign one env value to another key APP_URL=${BASE_URL
+      expandVariables: true, // This means we can assign one env value to another key APP_URL=${BASE_URL}
     }),
     UsersModule,
   ],

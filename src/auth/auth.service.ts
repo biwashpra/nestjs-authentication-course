@@ -67,7 +67,9 @@ export class AuthService {
       user.verificationTokenExpiresAt &&
       user.verificationTokenExpiresAt < new Date()
     ) {
-      throw new BadRequestException('Verification token Expired');
+      throw new BadRequestException(
+        'Verification token has expired. Please request a new one',
+      );
     }
 
     await this.usersService.update(user.id, {
@@ -202,7 +204,7 @@ export class AuthService {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // This is 7d in ms
+      maxAge: 7 * this.tokenTtl, // This is 7d in ms
     });
   }
 }
