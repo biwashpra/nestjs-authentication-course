@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class EmailService {
   private resend: Resend;
-  private fromEmail = 'mebiswas1999@gmail.com';
+  private fromEmail = 'onboarding@resend.dev';
 
   constructor(private readonly configService: ConfigService) {
     this.resend = new Resend(this.configService.get<string>('RESEND_API_KEY'));

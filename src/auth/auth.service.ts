@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { EmailService } from './email/email.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { User } from '../db/schema';
+import type { User } from '../db/schema';
 import { Response } from 'express';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
@@ -138,7 +138,7 @@ export class AuthService {
     let payload: { sub: string; email: string; role: User['role'] };
     try {
       payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get('JWT_ACCESS_SECRET'),
+        secret: this.configService.get('JWT_REFRESH_SECRET'),
       });
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
