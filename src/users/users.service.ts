@@ -1,10 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { db } from '../db';
 import { eq } from 'drizzle-orm';
-import { NewUser, User, users } from '../db/schema';
+import { NewUser, users } from '../db/schema';
 
 @Injectable()
 export class UsersService {
+  async findByVerificationToken(token: string) {
+    return db.query.users.findFirst({
+      where: eq(users.verificationToken, token),
+    });
+  }
+
   async findByEmail(email: string) {
     return db.query.users.findFirst({
       where: eq(users.email, email),
@@ -22,7 +28,7 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, data: User) {
+  async update(id: string, data: Partial<NewUser>) {
     const [updatedUser] = await db
       .update(users)
       .set(data)
