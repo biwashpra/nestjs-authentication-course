@@ -5,6 +5,12 @@ import { NewUser, users } from '../db/schema';
 
 @Injectable()
 export class UsersService {
+  async findByResetToken(token: string) {
+    return db.query.users.findFirst({
+      where: eq(users.resetToken, token),
+    });
+  }
+
   async findByVerificationToken(token: string) {
     return db.query.users.findFirst({
       where: eq(users.verificationToken, token),

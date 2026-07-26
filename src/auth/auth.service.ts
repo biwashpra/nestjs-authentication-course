@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
@@ -176,6 +177,54 @@ export class AuthService {
     res.clearCookie('refresh_token');
 
     return { message: 'Logout successfully' };
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('Account not found');
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1hr
+
+    await this.usersService.update(user.id, {
+      resetToken,
+      resetTokenExpiresAt,
+    });
+
+    void this.emailService.sendPasswordResetEmail(user.email, resetToken);
+
+    return {
+      message:
+        'If an account with the email exists, a reset link has been sent.',
+    };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.usersService.findByResetToken(token);
+
+    if (!user || !user.resetToken) {
+      throw new BadRequestException('Invalid reset token');
+    }
+
+    if (user.resetTokenExpiresAt && user.resetTokenExpiresAt < new Date()) {
+      throw new BadRequestException(
+        'Reset token has expired. Please request a new one',
+      );
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+
+    await this.usersService.update(user.id, {
+      passwordHash,
+      resetToken: null,
+      resetTokenExpiresAt: null,
+    });
+
+    return {
+      message: 'Password reset successful. You can now log in.',
+    };
   }
 
   private async generateTokens(user: User) {
