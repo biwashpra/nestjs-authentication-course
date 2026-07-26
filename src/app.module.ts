@@ -8,9 +8,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { RolesGuard } from './common/guards/roles.guard';
 import { TasksModule } from './tasks/tasks.module';
 import { AdminModule } from './admin/admin.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    // This throttler config state in 60000ms only 20 api hit is allowed per ip
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 20 }]),
     ConfigModule.forRoot({
       isGlobal: true,
       expandVariables: true, // This means we can assign one env value to another key APP_URL=${BASE_URL}
@@ -23,6 +26,7 @@ import { AdminModule } from './admin/admin.module';
   ],
   controllers: [],
   providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
